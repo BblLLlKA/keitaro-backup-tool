@@ -7,9 +7,10 @@ export class UserRepository extends BaseRepository {
     }
 
     async findByEmail(email) {
-        return this.model.findUnique({
+        return this.model.findFirst({
             where: {
                 email,
+                deletedAt: null,
             },
             include: {
                 role: true,
@@ -18,9 +19,10 @@ export class UserRepository extends BaseRepository {
     }
 
     async findById(id) {
-        return this.model.findUnique({
+        return this.model.findFirst({
             where: {
                 id,
+                deletedAt: null,
             },
             include: {
                 role: true,
@@ -32,6 +34,7 @@ export class UserRepository extends BaseRepository {
         return super.findAll({
             ...query,
             include: {
+                ...((query ?? {}).include ?? {}),
                 role: true,
             },
         });
@@ -52,6 +55,20 @@ export class UserRepository extends BaseRepository {
                 id,
             },
             data,
+            include: {
+                role: true,
+            },
+        });
+    }
+
+    async delete(id) {
+        return this.model.update({
+            where: {
+                id,
+            },
+            data: {
+                deletedAt: new Date(),
+            },
             include: {
                 role: true,
             },

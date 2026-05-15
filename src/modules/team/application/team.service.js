@@ -1,5 +1,6 @@
 import logger from '../../../lib/logger.js';
 import { BaseService } from '../../../shared/core/BaseService.js';
+import { NotFoundError } from '../../../shared/core/errors.js';
 import { TeamResponseDto } from '../dto/index.js';
 
 export class TeamService extends BaseService {
@@ -39,6 +40,10 @@ export class TeamService extends BaseService {
     async getById(id) {
         logger.info({ action: 'GET_TEAM_BY_ID', id });
         const team = await this.repository.findById(id);
+
+        if (!team) {
+            throw new NotFoundError('Team not found');
+        }
 
         return new TeamResponseDto(team);
     }

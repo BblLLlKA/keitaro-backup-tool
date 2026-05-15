@@ -19,9 +19,12 @@ model Server {
   teamId    String     @db.Uuid
   team      Team       @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
+  deletedAt DateTime?
+
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
   @@index([teamId])
+  @@index([deletedAt])
   @@map("servers")
 }

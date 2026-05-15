@@ -1,4 +1,5 @@
 import logger from '../../../lib/logger.js';
+import { NotFoundError } from '../../../shared/core/errors.js';
 import { RoleResponseDto } from '../dto/role-response.dto.js';
 
 export class RoleService {
@@ -18,6 +19,10 @@ export class RoleService {
         logger.info({ action: 'GET_ROLE_BY_ID', id });
 
         const role = await this.roleRepository.findById(id);
+
+        if (!role) {
+            throw new NotFoundError('Role not found');
+        }
 
         return new RoleResponseDto(role);
     }

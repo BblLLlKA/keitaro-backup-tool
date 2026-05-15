@@ -10,6 +10,10 @@ export class ServerRepository extends BaseRepository {
         return this.model.findMany({
             where: {
                 teamId,
+                deletedAt: null,
+                team: {
+                    deletedAt: null,
+                },
             },
         });
     }
@@ -32,9 +36,12 @@ export class ServerRepository extends BaseRepository {
     }
 
     async delete(id, include = {}) {
-        return this.model.delete({
+        return this.model.update({
             where: {
                 id,
+            },
+            data: {
+                deletedAt: new Date(),
             },
             include,
         });
@@ -56,17 +63,26 @@ export class ServerRepository extends BaseRepository {
             Number.isInteger(limitNumber) && limitNumber > 0 ? limitNumber : 20;
         const skip = (safePage - 1) * safeLimit;
 
+        const whereWithFilter = {
+            ...where,
+            deletedAt: null,
+            team: {
+                ...(where?.team ?? {}),
+                deletedAt: null,
+            },
+        };
+
         const [items, total] = await Promise.all([
             this.model.findMany({
                 skip,
                 take: safeLimit,
-                where,
+                where: whereWithFilter,
                 orderBy,
                 include,
             }),
 
             this.model.count({
-                where,
+                where: whereWithFilter,
             }),
         ]);
 
@@ -80,9 +96,13 @@ export class ServerRepository extends BaseRepository {
     }
 
     async findById(id, include = {}) {
-        return this.model.findUnique({
+        return this.model.findFirst({
             where: {
                 id,
+                deletedAt: null,
+                team: {
+                    deletedAt: null,
+                },
             },
             include,
         });

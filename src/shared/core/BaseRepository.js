@@ -21,17 +21,22 @@ export class BaseRepository {
             Number.isInteger(limitNumber) && limitNumber > 0 ? limitNumber : 20;
         const skip = (safePage - 1) * safeLimit;
 
+        const whereWithFilter = {
+            ...where,
+            deletedAt: null,
+        };
+
         const [items, total] = await Promise.all([
             this.model.findMany({
                 skip,
                 take: safeLimit,
-                where,
+                where: whereWithFilter,
                 orderBy,
                 include,
             }),
 
             this.model.count({
-                where,
+                where: whereWithFilter,
             }),
         ]);
 
@@ -45,9 +50,10 @@ export class BaseRepository {
     }
 
     async findById(id, include = {}) {
-        return this.model.findUnique({
+        return this.model.findFirst({
             where: {
                 id,
+                deletedAt: null,
             },
             include,
         });
@@ -55,7 +61,10 @@ export class BaseRepository {
 
     async findOne(where = {}, include = {}) {
         return this.model.findFirst({
-            where,
+            where: {
+                ...where,
+                deletedAt: null,
+            },
             include,
         });
     }
@@ -76,9 +85,12 @@ export class BaseRepository {
     }
 
     async delete(id) {
-        return this.model.delete({
+        return this.model.update({
             where: {
                 id,
+            },
+            data: {
+                deletedAt: new Date(),
             },
         });
     }

@@ -12,6 +12,8 @@ model User {
 
   lastLoginAt DateTime?
 
+  deletedAt   DateTime?
+
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
@@ -19,6 +21,7 @@ model User {
 
   @@index([email])
   @@index([roleId])
+  @@index([deletedAt])
 
   @@map("users")
 }

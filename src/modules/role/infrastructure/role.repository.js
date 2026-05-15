@@ -3,6 +3,9 @@ import prisma from '../../../lib/prisma.js';
 export class RoleRepository {
     async findAll() {
         return prisma.userRole.findMany({
+            where: {
+                deletedAt: null,
+            },
             orderBy: {
                 createdAt: 'asc',
             },
@@ -10,20 +13,26 @@ export class RoleRepository {
     }
 
     async findById(id) {
-        return prisma.userRole.findUnique({
+        return prisma.userRole.findFirst({
             where: {
                 id,
+                deletedAt: null,
             },
             include: {
-                users: true,
+                users: {
+                    where: {
+                        deletedAt: null,
+                    },
+                },
             },
         });
     }
 
     async findByName(name) {
-        return prisma.userRole.findUnique({
+        return prisma.userRole.findFirst({
             where: {
                 name,
+                deletedAt: null,
             },
         });
     }
@@ -35,9 +44,12 @@ export class RoleRepository {
     }
 
     async delete(id) {
-        return prisma.userRole.delete({
+        return prisma.userRole.update({
             where: {
                 id,
+            },
+            data: {
+                deletedAt: new Date(),
             },
         });
     }

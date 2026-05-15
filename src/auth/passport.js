@@ -18,9 +18,10 @@ passport.use(
 
         async (payload, done) => {
             try {
-                const user = await prisma.user.findUnique({
+                const user = await prisma.user.findFirst({
                     where: {
                         id: payload.sub,
+                        deletedAt: null,
                     },
                     include: {
                         role: true,

@@ -86,6 +86,10 @@ export class ServerService extends BaseService {
         logger.info({ action: 'GET_SERVER_BY_ID', id });
         const server = await this.repository.findById(id, SERVER_RELATIONS);
 
+        if (!server) {
+            throw new NotFoundError('Server not found');
+        }
+
         return new ServerResponseDto({
             ...server,
             password: decryptPassword(server.password),

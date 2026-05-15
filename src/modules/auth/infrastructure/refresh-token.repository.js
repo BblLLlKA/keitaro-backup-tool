@@ -22,4 +22,10 @@ export class RefreshTokenRepository {
             data: { revokedAt: new Date() },
         });
     }
+
+    async delete(token) {
+        return prisma.refreshToken.delete({
+            where: { token },
+        });
+    }
 }

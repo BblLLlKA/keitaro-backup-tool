@@ -3,8 +3,12 @@ model UserRole {
   name      String    @unique
   users     User[]
 
+  deletedAt DateTime?
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+
+  @@index([deletedAt])
 
   @@map("user_roles")
 }
