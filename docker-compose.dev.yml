@@ -12,7 +12,7 @@ services:
     ports:
       - "${PORT}:${PORT}"
 
-    command: sh -c "npx prisma generate && npx prisma db push && npm run dev"
+    command: sh -c "npx prisma generate && npx prisma db push --accept-data-loss && npm run dev"
 
     develop:
       watch:

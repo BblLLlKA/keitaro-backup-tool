@@ -1,0 +1,27 @@
+enum ServerType {
+  MAIN
+  RESERV
+}
+
+model Server {
+  id        String     @id @default(uuid()) @db.Uuid
+
+  name      String     @unique
+  ip        String     @unique
+  port      Int
+  username  String
+  password  String
+  type      ServerType @default(MAIN)
+
+  isDumping Boolean    @default(false)
+  isActive  Boolean    @default(true)
+
+  teamId    String     @db.Uuid
+  team      Team       @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([teamId])
+  @@map("servers")
+}
