@@ -70,14 +70,14 @@ export class TeamRepository extends BaseRepository {
         });
     }
 
-    async create(data) {
+    async create(data, include = {}) {
         return this.model.create({
             data,
             include,
         });
     }
 
-    async update(id, data) {
+    async update(id, data, include = {}) {
         return this.model.update({
             where: {
                 id,
@@ -87,7 +87,7 @@ export class TeamRepository extends BaseRepository {
         });
     }
 
-    async delete(id) {
+    async delete(id, include = {}) {
         return this.model.update({
             where: {
                 id,
