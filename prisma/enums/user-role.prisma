@@ -1,0 +1,2 @@
+// UserRole is now a database model in prisma/models/user-role.prisma
+// This file is kept for reference but should not be used

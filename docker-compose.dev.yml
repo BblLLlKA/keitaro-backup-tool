@@ -1,0 +1,84 @@
+services:
+  app:
+    container_name: kbt_app_dev
+
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+
+    env_file:
+      - .env
+
+    ports:
+      - "${PORT}:${PORT}"
+
+    command: sh -c "npx prisma generate && npx prisma db push && npm run dev"
+
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /app
+          ignore:
+            - node_modules/
+            - .git/
+            - dist/
+            - coverage/
+
+        - action: rebuild
+          path: package.json
+
+        - action: rebuild
+          path: package-lock.json
+
+        - action: sync+restart
+          path: prisma/schema.prisma
+          target: /app/prisma/schema.prisma
+
+    depends_on:
+      - postgres
+
+    restart: unless-stopped
+
+  postgres:
+    container_name: kbt_postgres_dev
+
+    image: postgres:16-alpine
+
+    env_file:
+      - .env
+
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -h localhost -p $${POSTGRES_PORT}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+    restart: unless-stopped
+
+  prisma-studio:
+    container_name: kbt_prisma_studio
+
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+
+    env_file:
+      - .env
+
+    command: sh -c "npx prisma studio --port 5555 --browser none --url \"$DATABASE_URL\""
+
+    ports:
+      - "5555:5555"
+
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_dev_data:
